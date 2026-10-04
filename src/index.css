@@ -1,0 +1,125 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Manrope: una sola familia para toda la app. Es humanista y de formas
+     abiertas (se lee cercana, no clínica) y tiene cifras parejas, que importa
+     en una app que muestra valores de glucosa. El product UI no necesita
+     un par display/body: un solo tipo bien graduado alcanza. */
+  --font-sans: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* Paleta de marca Diabex.
+     Azul profundo del logo: marca-800 (#004682)
+     Celeste del isotipo y de la "x": marca-500 (#008bdd) */
+  --color-marca-50: #eef7fd;
+  --color-marca-100: #d6ecfa;
+  --color-marca-200: #b0daf5;
+  --color-marca-300: #7cc1ec;
+  --color-marca-400: #3ea5e3;
+  --color-marca-500: #008bdd;
+  --color-marca-600: #0071b9;
+  --color-marca-700: #005b96;
+  --color-marca-800: #004682;
+  --color-marca-900: #0a3868;
+  --color-marca-950: #062545;
+
+  /* Curva de salida exponencial: arranca rápido y frena. Es la única que usa
+     la app, así que todo se mueve con el mismo carácter. Sin rebotes. */
+  --ease-salida: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Escala de z-index, por nombre y no por número suelto.
+   Si hace falta una capa nueva, se agrega acá y se usa con z-[var(--z-...)]. */
+:root {
+  --z-sticky: 20;
+  --z-tabbar: 30;
+  /* El aviso de versión nueva se apoya sobre la barra de pestañas, pero una
+     hoja abierta lo tapa: mientras hay un diálogo, nada compite con él. */
+  --z-aviso: 40;
+  --z-hoja: 50;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+/* Cifras de ancho fijo: las columnas de horas y valores no bailan al cambiar. */
+.cifras {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Entrada de cada pantalla al cambiar de pestaña. Sin fill-mode a propósito:
+   si la animación no llega a correr, el contenido ya está visible. */
+.pantalla {
+  animation: entrar-pantalla 220ms var(--ease-salida);
+}
+
+@keyframes entrar-pantalla {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pantalla {
+    animation: none;
+  }
+}
+
+/* Hoja de cuenta. La animación va por keyframes y no por una clase que
+   encienda la visibilidad: si la animación no llega a correr (pestaña en
+   segundo plano, motor sin frames), la hoja igual se ve, que es lo que importa. */
+@keyframes hoja-fondo-entra {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes hoja-fondo-sale {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes hoja-entra {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes hoja-sale {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+.hoja {
+  animation: hoja-fondo-entra 200ms ease-out;
+}
+
+.hoja > .hoja-panel {
+  animation: hoja-entra 260ms var(--ease-salida);
+}
+
+.hoja.cerrando {
+  animation: hoja-fondo-sale 200ms ease-in forwards;
+}
+
+.hoja.cerrando > .hoja-panel {
+  animation: hoja-sale 200ms ease-in forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hoja,
+  .hoja > .hoja-panel,
+  .hoja.cerrando,
+  .hoja.cerrando > .hoja-panel {
+    animation: none;
+  }
+}

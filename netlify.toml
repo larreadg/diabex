@@ -1,0 +1,28 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Diabex es una SPA: las rutas las resuelve React Router en el cliente, y en
+# disco sólo existe index.html. Sin esta regla, entrar directo o recargar en
+# /registro/historial da 404, y la vuelta de Google a /auth/callback también.
+#
+# Netlify sirve primero el archivo que exista, así que /sw.js, /assets/* y
+# /manifest.webmanifest siguen saliendo como corresponde: esto sólo actúa
+# cuando ninguna ruta coincide con un archivo real.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# El service worker se revalida siempre. Si el navegador se queda con una copia
+# vieja, la app deja de poder actualizarse y no hay forma de arreglarlo desde
+# el próximo deploy: el worker viejo sigue sirviendo el build viejo.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
