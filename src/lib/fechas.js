@@ -39,6 +39,23 @@ export function claveLocal(fecha) {
   return `${anio}-${mes}-${dia}`
 }
 
+/**
+ * La medianoche local de una clave `AAAA-MM-DD`. `new Date('2026-10-16')` la
+ * leería como medianoche UTC, que acá todavía es el día anterior.
+ */
+export function desdeClave(clave) {
+  const [anio, mes, dia] = clave.split('-').map(Number)
+  return new Date(anio, mes - 1, dia)
+}
+
+/**
+ * Días de calendario entre dos medianoches locales. Se redondea porque con un
+ * cambio de horario un día no dura exactamente 24 h.
+ */
+export function diasEntre(desde, hasta) {
+  return Math.round((hasta - desde) / 86_400_000)
+}
+
 /** Cuántos días tiene el mes y en qué columna arranca, con la semana de lunes a domingo. */
 export function estructuraDelMes(anio, mes) {
   const primero = new Date(anio, mes, 1)

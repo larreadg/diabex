@@ -82,6 +82,17 @@ export function IconoCruz({ className = 'h-4 w-4' }) {
   )
 }
 
+/** Círculo con signo de exclamación, para avisos del servicio. */
+export function IconoAviso({ className = 'h-5 w-5' }) {
+  return (
+    <Svg className={className}>
+      <circle cx="12" cy="12" r="8.8" />
+      <path d="M12 7.5v5.5" />
+      <path d="M12 16.4v.1" strokeWidth={2.2} />
+    </Svg>
+  )
+}
+
 /** Cheurón a la derecha, para filas que llevan a otro lado. */
 export function IconoCheuron({ className = 'h-4 w-4' }) {
   return (

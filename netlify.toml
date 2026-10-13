@@ -26,3 +26,10 @@
   for = "/manifest.webmanifest"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+
+# El aviso de pago pendiente se lee de acá en cada visita. Sin revalidar, el
+# navegador podría seguir mostrando el aviso después de sacarlo.
+[[headers]]
+  for = "/estado-servicio.json"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

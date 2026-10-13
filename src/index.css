@@ -115,6 +115,31 @@ body {
   animation: hoja-sale 200ms ease-in forwards;
 }
 
+/* Modal de acceso restringido. Mismo criterio que la hoja: el estado base es
+   el visible y los keyframes sólo entran desde afuera. No tiene salida
+   animada porque no se cierra: desaparece cuando se levanta la restricción. */
+@keyframes modal-servicio-entra {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+.modal-servicio {
+  animation: hoja-fondo-entra 200ms ease-out;
+}
+
+.modal-servicio > .modal-servicio-panel {
+  animation: modal-servicio-entra 240ms var(--ease-salida);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-servicio,
+  .modal-servicio > .modal-servicio-panel {
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hoja,
   .hoja > .hoja-panel,

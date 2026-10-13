@@ -1,0 +1,14 @@
+{
+  "activo": true,
+  "desde": "2026-10-12",
+  "fechaLimite": "2026-10-16",
+  "opacidadMinima": 0.7,
+  "aviso": {
+    "titulo": "Pago pendiente de servicios",
+    "texto": "Hay un pago pendiente por el dominio y el hosting, la base de datos y el servicio de IA que usa Diabex. Si no se regulariza hasta el {fecha}, el acceso a la aplicación va a quedar restringido."
+  },
+  "restriccion": {
+    "titulo": "Acceso restringido temporalmente",
+    "texto": "Restringimos el acceso a Diabex por un pago pendiente de los servicios que la sostienen: dominio y hosting, base de datos y procesamiento con IA. El acceso se restablece apenas se regularice el pago."
+  }
+}
