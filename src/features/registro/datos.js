@@ -44,6 +44,42 @@ export async function obtenerMedicionesDelMes(userId, anio, mes) {
   return data ?? []
 }
 
+// PostgREST corta cada respuesta en 1000 filas por defecto. Un año de
+// controles puede pasarse de eso, y un informe que se queda sin los últimos
+// meses sin avisar es peor que uno que tarda un poco más.
+const FILAS_POR_PAGINA = 1000
+
+/**
+ * Mediciones entre dos días locales, ambos incluidos, de la más temprana a la
+ * más reciente. `desde` y `hasta` son medianoches locales (`desdeClave()`): los
+ * límites se arman acá en hora local y recién después se pasan a instantes.
+ */
+export async function obtenerMedicionesEntre(userId, desde, hasta) {
+  const inicio = new Date(desde)
+  inicio.setHours(0, 0, 0, 0)
+  const fin = new Date(hasta)
+  fin.setHours(23, 59, 59, 999)
+
+  const todas = []
+  for (let pagina = 0; ; pagina += 1) {
+    const { data, error } = await supabase
+      .from('mediciones')
+      .select(COLUMNAS)
+      .eq('usuario_id', userId)
+      .gte('medido_en', inicio.toISOString())
+      .lte('medido_en', fin.toISOString())
+      // El id desempata dos controles del mismo instante: sin un orden total,
+      // una fila podría repetirse o perderse entre una página y la siguiente.
+      .order('medido_en', { ascending: true })
+      .order('id', { ascending: true })
+      .range(pagina * FILAS_POR_PAGINA, (pagina + 1) * FILAS_POR_PAGINA - 1)
+
+    if (error) throw error
+    todas.push(...(data ?? []))
+    if (!data || data.length < FILAS_POR_PAGINA) return todas
+  }
+}
+
 /**
  * Guarda una medición. `medido_en` lo pone la base con su propio reloj: el del
  * teléfono puede estar desfasado y acá la hora importa.

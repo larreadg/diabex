@@ -80,6 +80,10 @@ export default defineConfig({
       workbox: {
         // Sólo el resultado del build. Las imágenes van por `includeAssets`.
         globPatterns: ['**/*.{js,css,html}'],
+        // El informe en PDF necesita red igual (las mediciones vienen de
+        // Supabase), así que precargarlo sería sumar casi 1 MB a cada
+        // instalación para algo que sin conexión no puede funcionar.
+        globIgnores: ['assets/informe/**'],
 
         // La app es una SPA: cualquier ruta se resuelve con index.html. El
         // callback de Google también, porque el token viaja en el fragmento y
@@ -108,6 +112,29 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        // jsPDF, sus dependencias opcionales y el generador del informe van a
+        // una carpeta propia: así el service worker los deja afuera por ruta,
+        // sin depender de cómo se llame cada pedazo.
+        chunkFileNames(pedazo) {
+          const delInforme = pedazo.moduleIds.some((id) =>
+            /\/node_modules\/(jspdf|jspdf-autotable|html2canvas|canvg|dompurify)\/|\/registro\/informe\//.test(
+              id,
+            ),
+          )
+          return delInforme ? 'assets/informe/[name]-[hash].js' : 'assets/[name]-[hash].js'
+        },
+        assetFileNames(archivo) {
+          const nombre = archivo.names?.[0] ?? ''
+          return /^Manrope-.*\.ttf$/.test(nombre)
+            ? 'assets/informe/[name]-[hash][extname]'
+            : 'assets/[name]-[hash][extname]'
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

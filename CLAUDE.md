@@ -148,6 +148,9 @@ Tres archivos, ninguno con UI adentro:
 | `features/registro/datos.js` | Lectura y alta en Supabase |
 | `features/registro/presentacion.js` | Medición → fila del riel, y agrupado por día |
 | `features/registro/HojaMedicion.jsx` | Detalle de un control, y el único lugar desde donde se borra |
+| `features/registro/HojaExportar.jsx` | Elegir un rango de fechas y bajar el informe en PDF |
+| `features/registro/informe/resumen.js` | Números del período y franjas de la barra, función pura |
+| `features/registro/informe/generarPdf.js` | Dibuja el informe A4 con jsPDF y lo descarga |
 
 Reglas que no se negocian:
 
@@ -167,6 +170,24 @@ Reglas que no se negocian:
 Los umbrales de `lib/glucosa.js` son los de referencia habituales. El rango
 objetivo se personaliza por paciente: el paso siguiente es leerlo del perfil en
 vez de usar constantes.
+
+## El informe en PDF
+
+Desde Registro se baja un informe A4 de un rango de fechas (hasta un año): las
+cifras del período, la distribución por banda, la evolución y la tabla de
+cada control. Se arma en el dispositivo con jsPDF; no hay servidor ni archivo
+guardado en ningún lado.
+
+- **`generarPdf.js` se carga con `import()`** recién al tocar "Descargar". jsPDF
+  y las fuentes pesan casi 1 MB; importarlo de forma estática lo mete en el
+  bundle de entrada.
+- Las fuentes son Manrope en TTF estático (`informe/fuentes/`, licencia OFL).
+  Con las fuentes que trae jsPDF los acentos dependen del visor.
+- Los números se calculan sobre el `nivel` guardado, no reclasificando: el
+  informe cuenta lo mismo que la persona vio en la app en su momento.
+- El nombre del día va dibujado dentro de la primera fila de ese día, no como
+  fila aparte: así nunca queda solo al pie de una página.
+- `obtenerMedicionesEntre` pagina de a 1000 filas, el tope de PostgREST.
 
 ## Las guías de Autoayuda
 
@@ -361,6 +382,11 @@ Tres reglas que no se tocan sin pensarlo:
   componente es el que registra el service worker: si vive adentro de
   `AppLayout` sólo se monta con sesión iniciada, y entonces en `/login` —la
   pantalla desde la que se instala la app— no se registra nada.
+
+El informe en PDF queda **fuera de la precarga**: `chunkFileNames` manda jsPDF,
+sus dependencias opcionales y las fuentes a `assets/informe/`, y `globIgnores`
+excluye esa carpeta. Sin conexión no hay mediciones que exportar, así que
+precargarlo sumaría casi 1 MB a cada instalación para nada.
 
 La precarga se lista archivo por archivo en `includeAssets`, no con un
 `**/*.png`: en `public/` viven también los originales de 4096 px del logo, y un

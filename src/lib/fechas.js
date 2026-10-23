@@ -73,3 +73,23 @@ export function limitesDelMes(anio, mes) {
     hasta: new Date(anio, mes + 1, 0, 23, 59, 59, 999),
   }
 }
+
+const FORMATO_DIA_MES_ANIO = new Intl.DateTimeFormat('es-AR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+})
+
+/**
+ * "Del 23 de septiembre al 22 de octubre de 2026". El año se repite sólo si
+ * cambia en el medio; un solo día se dice como un solo día.
+ */
+export function textoDelRango(desde, hasta) {
+  const inicioYFin = FORMATO_DIA_MES_ANIO.format(hasta)
+  if (claveLocal(desde) === claveLocal(hasta)) {
+    return inicioYFin.charAt(0).toUpperCase() + inicioYFin.slice(1)
+  }
+  const mismoAnio = desde.getFullYear() === hasta.getFullYear()
+  const inicio = mismoAnio ? FORMATO_DIA.format(desde) : FORMATO_DIA_MES_ANIO.format(desde)
+  return `Del ${inicio} al ${inicioYFin}`
+}

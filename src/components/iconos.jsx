@@ -144,3 +144,15 @@ export function IconoSalir({ className = 'h-5 w-5' }) {
     </Svg>
   )
 }
+
+/** Una hoja con una flecha hacia abajo, para bajar un archivo. */
+export function IconoDescarga({ className = 'h-5 w-5' }) {
+  return (
+    <Svg className={className}>
+      <path d="M14 3.5H7.5A1.5 1.5 0 0 0 6 5v14a1.5 1.5 0 0 0 1.5 1.5h9A1.5 1.5 0 0 0 18 19V7.5z" />
+      <path d="M14 3.5V7.5h4" opacity="0.6" />
+      <path d="M12 10.5v6" />
+      <path d="m9.5 14 2.5 2.5 2.5-2.5" />
+    </Svg>
+  )
+}

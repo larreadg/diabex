@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom'
 import Alert from '@/components/Alert'
 import EncabezadoPantalla from '@/components/EncabezadoPantalla'
 import RielDelDia from '@/components/RielDelDia'
-import { IconoCheuron } from '@/components/iconos'
+import { IconoCheuron, IconoDescarga } from '@/components/iconos'
 import { useAuth } from '@/context/AuthContext'
 import { obtenerMedicionesDeHoy } from '@/features/registro/datos'
+import HojaExportar from '@/features/registro/HojaExportar'
 import HojaMedicion from '@/features/registro/HojaMedicion'
 import { aFilaDelRiel } from '@/features/registro/presentacion'
 import { mensajeDeError } from '@/lib/errores'
@@ -63,6 +64,7 @@ function useMedicionesDeHoy() {
 export default function Registro() {
   const { mediciones, cargando, error, quitar } = useMedicionesDeHoy()
   const [elegida, setElegida] = useState(null)
+  const [exportando, setExportando] = useState(false)
   const hayMediciones = mediciones.length > 0
   const enRango = mediciones.filter((m) => m.nivel === 'en_rango').length
 
@@ -124,20 +126,38 @@ export default function Registro() {
         ) : null}
       </section>
 
-      <Link
-        to="/registro/historial"
-        className="mt-6 flex min-h-14 items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-marca-600"
-      >
-        <span>
-          <span className="block text-sm font-semibold text-slate-900">
-            Ver mis mediciones por fecha
+      {/* Las dos miradas hacia atrás van juntas, como filas de una misma
+          lista: el calendario para revisar y el PDF para llevar. */}
+      <div className="mt-6 divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <Link
+          to="/registro/historial"
+          className="flex min-h-14 items-center justify-between gap-3 px-4 py-3 transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-marca-600"
+        >
+          <span>
+            <span className="block text-sm font-semibold text-slate-900">
+              Ver mis mediciones por fecha
+            </span>
+            <span className="mt-0.5 block text-sm text-slate-600">
+              Un calendario con todo lo que anotaste.
+            </span>
           </span>
-          <span className="mt-0.5 block text-sm text-slate-600">
-            Un calendario con todo lo que anotaste.
+          <IconoCheuron className="h-4 w-4 shrink-0 text-slate-400" />
+        </Link>
+
+        <button
+          type="button"
+          onClick={() => setExportando(true)}
+          className="flex min-h-14 w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-marca-600"
+        >
+          <span>
+            <span className="block text-sm font-semibold text-slate-900">Exportar en PDF</span>
+            <span className="mt-0.5 block text-sm text-slate-600">
+              Elegí las fechas y bajá un informe para tu equipo de salud.
+            </span>
           </span>
-        </span>
-        <IconoCheuron className="h-4 w-4 shrink-0 text-slate-400" />
-      </Link>
+          <IconoDescarga className="h-5 w-5 shrink-0 text-marca-700" />
+        </button>
+      </div>
 
       <section className="mt-6 border-t border-slate-200 pt-6">
         <Link
@@ -156,6 +176,8 @@ export default function Registro() {
         onCerrar={() => setElegida(null)}
         onBorrada={quitar}
       />
+
+      <HojaExportar abierta={exportando} onCerrar={() => setExportando(false)} />
     </>
   )
 }
